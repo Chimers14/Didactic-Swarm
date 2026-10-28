@@ -1,0 +1,3548 @@
+/* =========================================================
+   DIDACTIC-SWARM — MAIN STYLES
+========================================================= */
+
+:root {
+    color-scheme: dark;
+
+    --bg: #a6af2c7e;
+    --panel-bg: #090909;
+    --text: #ffffff;
+    --muted: #777777;
+    --subtle: #444444;
+    --border: rgba(255, 255, 255, 0.17);
+    --control-bg: rgba(255, 255, 255, 0.035);
+    --control-hover: rgba(255, 255, 255, 0.09);
+    --fade-rgb: 0, 0, 0;
+
+    --rainbow-gradient:
+        #a83232,
+        #c47a22,
+        #b8b52a,
+        #27a957,
+        #2187a8,
+        #5545a8,
+        #9a329d,
+        #a83232;
+
+    --rainbow-speed: 7s;
+    --panel-width: 420px;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    width: 100%;
+    min-height: 100%;
+    background: var(--bg);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+body {
+    width: 100%;
+    min-height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    overscroll-behavior: none;
+
+    font-family:
+        "Fira Code",
+        "JetBrains Mono",
+        "Cascadia Code",
+        "SFMono-Regular",
+        Consolas,
+        "Liberation Mono",
+        Menlo,
+        monospace;
+
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+button {
+    color: inherit;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+button:focus-visible,
+input:focus-visible {
+    outline: 1px solid var(--text);
+    outline-offset: 4px;
+}
+
+.app {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    overflow: hidden;
+    isolation: isolate;
+    background: var(--bg);
+    transition: background-color 0.3s ease;
+}
+
+/* =========================================================
+   THEMES
+========================================================= */
+
+.app[data-theme="light"] {
+    color-scheme: light;
+
+    --bg: #f1f0ec;
+    --panel-bg: #ffffff;
+    --text: #171717;
+    --muted: #626262;
+    --subtle: #aaaaaa;
+    --border: rgba(0, 0, 0, 0.18);
+    --control-bg: rgba(0, 0, 0, 0.035);
+    --control-hover: rgba(0, 0, 0, 0.075);
+    --fade-rgb: 241, 240, 236;
+}
+
+.app[data-theme="dark"] {
+    color-scheme: dark;
+
+    --bg: #000000;
+    --panel-bg: #090909;
+    --text: #ffffff;
+    --muted: #777777;
+    --subtle: #444444;
+    --border: rgba(255, 255, 255, 0.17);
+    --control-bg: rgba(255, 255, 255, 0.035);
+    --control-hover: rgba(255, 255, 255, 0.09);
+    --fade-rgb: 0, 0, 0;
+}
+
+/* =========================================================
+   CANVASES
+========================================================= */
+
+#boidCanvas,
+#settingsParticleCanvas {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+#boidCanvas {
+    z-index: 0;
+    transition: opacity 0.4s ease;
+}
+
+/*
+   The particle canvas is the animation layer for BOTH the
+   settings menu and the music ribbon. It sits above the
+   overlays so the letters stay crisp and are never blurred.
+*/
+#settingsParticleCanvas {
+    z-index: 30;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.app.settings-transitioning #settingsParticleCanvas,
+.app.settings-open #settingsParticleCanvas,
+.app.music-open #settingsParticleCanvas,
+.app.music-closing #settingsParticleCanvas {
+    opacity: 1;
+}
+
+/* The loose background letters are the ones that become the ribbon */
+.app.music-open #boidCanvas,
+.app.music-closing #boidCanvas {
+    opacity: 0;
+}
+
+/* =========================================================
+   BACKGROUND FADE
+========================================================= */
+
+.center-fade {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+
+    background: radial-gradient(
+        circle at center,
+        rgba(var(--fade-rgb), 0.72) 0%,
+        rgba(var(--fade-rgb), 0.45) 22%,
+        rgba(var(--fade-rgb), 0.12) 50%,
+        rgba(var(--fade-rgb), 0.45) 100%
+    );
+
+    transition: background 0.3s ease;
+}
+
+/* =========================================================
+   RAINBOW TEXT
+========================================================= */
+
+.rainbow-text,
+.orbit-button .scrambled,
+.orbit-button .real-label {
+    background-image: linear-gradient(
+        90deg,
+        var(--rainbow-gradient)
+    );
+
+    background-size: 500% 100%;
+    background-position: 0% 50%;
+
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    animation: rainbowCycle var(--rainbow-speed) linear infinite;
+}
+
+@keyframes rainbowCycle {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    100% {
+        background-position: 500% 50%;
+    }
+}
+
+.app.rainbow-disabled .rainbow-text,
+.app.rainbow-disabled .orbit-button .scrambled,
+.app.rainbow-disabled .orbit-button .real-label {
+    animation: none;
+    background-image: none;
+    -webkit-text-fill-color: var(--text);
+    color: var(--text);
+}
+
+.app.rainbow-disabled .orbit-mark {
+    background: var(--muted);
+}
+
+/* =========================================================
+   CORNER LABELS
+========================================================= */
+
+.corner,
+.status,
+.bottom-scramble {
+    position: fixed;
+    z-index: 5;
+    font-weight: 400;
+}
+
+.corner {
+    top: 25px;
+    left: 28px;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+}
+
+.status {
+    top: 25px;
+    right: 28px;
+    font-size: 8px;
+    letter-spacing: 0.12em;
+}
+
+.bottom-scramble {
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px;
+    letter-spacing: 0.25em;
+    white-space: nowrap;
+}
+
+/* =========================================================
+   MAIN STAGE
+========================================================= */
+
+.stage {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+
+    width: min(720px, 90vw);
+    height: min(720px, 90vh);
+    height: min(720px, 90dvh);
+
+    transform: translate(-50%, -50%);
+    z-index: 3;
+
+    transition: opacity 0.3s ease;
+}
+
+.title {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 2;
+
+    transform: translate(-50%, -50%);
+
+    font-size: clamp(25px, 4vw, 48px);
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0.9;
+
+    transition:
+        opacity 0.4s ease,
+        transform 0.7s cubic-bezier(.16, 1, .3, 1);
+}
+
+.scramble-line {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 3;
+
+    transform: translate(-50%, 42px);
+
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.center-hover-zone {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 6;
+
+    width: 190px;
+    height: 130px;
+
+    transform: translate(-50%, -50%);
+}
+
+/* =========================================================
+   ORBIT BUTTONS
+========================================================= */
+
+.orbit-button {
+    position: absolute;
+    z-index: 5;
+
+    display: grid;
+    place-items: center;
+
+    width: max-content;
+    min-width: 38px;
+    min-height: 38px;
+    padding: 6px 8px;
+
+    border: 0;
+    border-radius: 0;
+    outline-offset: 5px;
+
+    background: transparent;
+    font-size: 20px;
+    letter-spacing: 0.08em;
+    text-align: center;
+
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+
+    transition:
+        transform 0.3s cubic-bezier(.22, 1, .36, 1),
+        opacity 0.3s ease;
+}
+
+.scrambled,
+.real-label {
+    grid-column: 1;
+    grid-row: 1;
+    white-space: nowrap;
+}
+
+.scrambled {
+    opacity: 1;
+}
+
+.real-label {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.orbit-button:hover,
+.orbit-button:focus-visible,
+.orbit-button.revealed {
+    z-index: 10;
+}
+
+.orbit-button:hover .scrambled,
+.orbit-button:focus-visible .scrambled,
+.orbit-button.revealed .scrambled {
+    opacity: 0;
+}
+
+.orbit-button:hover .real-label,
+.orbit-button:focus-visible .real-label,
+.orbit-button.revealed .real-label {
+    opacity: 1;
+}
+
+.button-one {
+    top: 8%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.button-two {
+    top: 50%;
+    right: 8%;
+    transform: translateY(-50%);
+}
+
+.button-three {
+    bottom: 8%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.button-four {
+    top: 50%;
+    left: 8%;
+    transform: translateY(-50%);
+}
+
+.button-five {
+    top: 21%;
+    left: 21%;
+}
+
+.button-six {
+    top: 21%;
+    right: 21%;
+}
+
+.button-seven {
+    right: 21%;
+    bottom: 21%;
+}
+
+.button-eight {
+    bottom: 21%;
+    left: 21%;
+}
+
+.button-one:hover,
+.button-one:focus-visible,
+.button-one.revealed {
+    transform: translateX(-50%) scale(1.12);
+}
+
+.button-two:hover,
+.button-two:focus-visible,
+.button-two.revealed {
+    transform: translateY(-50%) scale(1.12);
+}
+
+.button-three:hover,
+.button-three:focus-visible,
+.button-three.revealed {
+    transform: translateX(-50%) scale(1.12);
+}
+
+.button-four:hover,
+.button-four:focus-visible,
+.button-four.revealed {
+    transform: translateY(-50%) scale(1.12);
+}
+
+.button-five:hover,
+.button-six:hover,
+.button-seven:hover,
+.button-eight:hover,
+.button-five:focus-visible,
+.button-six:focus-visible,
+.button-seven:focus-visible,
+.button-eight:focus-visible,
+.button-five.revealed,
+.button-six.revealed,
+.button-seven.revealed,
+.button-eight.revealed {
+    transform: scale(1.12);
+}
+
+.app.settings-transitioning .orbit-button,
+.app.settings-open .orbit-button,
+.app.music-open .orbit-button,
+.app.music-closing .orbit-button {
+    pointer-events: none;
+    opacity: 0;
+}
+
+.app.settings-transitioning .title,
+.app.settings-open .title,
+.app.music-open .title,
+.app.music-closing .title {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.15);
+}
+
+.app.settings-transitioning .scramble-line,
+.app.settings-open .scramble-line,
+.app.music-open .scramble-line,
+.app.music-closing .scramble-line {
+    opacity: 0;
+}
+
+.app.settings-transitioning .orbit-mark,
+.app.settings-open .orbit-mark,
+.app.music-open .orbit-mark,
+.app.music-closing .orbit-mark {
+    opacity: 0;
+}
+
+/* =========================================================
+   FLOATING MARKS
+========================================================= */
+
+.orbit-mark {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--subtle);
+    pointer-events: none;
+    animation: drift 6s linear infinite;
+}
+
+.mark-one {
+    top: 17%;
+    left: 25%;
+}
+
+.mark-two {
+    top: 27%;
+    right: 20%;
+    animation-delay: -2s;
+}
+
+.mark-three {
+    right: 27%;
+    bottom: 19%;
+    animation-delay: -4s;
+}
+
+.mark-four {
+    bottom: 25%;
+    left: 20%;
+    animation-delay: -1s;
+}
+
+@keyframes drift {
+    0%, 100% {
+        transform: translate(0, 0);
+        opacity: 0.15;
+    }
+
+    50% {
+        transform: translate(15px, -12px);
+        opacity: 0.8;
+    }
+}
+
+/* =========================================================
+   MUSIC — controls under the letter ribbon
+   No box, no fill. Just text on the page.
+========================================================= */
+
+.music-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 25;
+
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+
+    transition:
+        opacity 0.3s ease,
+        visibility 0.3s ease;
+}
+
+.app.music-open .music-overlay {
+    opacity: 1;
+    visibility: visible;
+}
+
+.close-music {
+    position: absolute;
+    top: max(14px, env(safe-area-inset-top));
+    right: max(18px, env(safe-area-inset-right));
+    z-index: 2;
+
+    width: 44px;
+    height: 44px;
+
+    display: grid;
+    place-items: center;
+
+    border: 0;
+    background-color: transparent;
+
+    font-size: 30px;
+    font-weight: 300;
+    line-height: 1;
+
+    cursor: pointer;
+    pointer-events: auto;
+    transition: transform 0.2s ease;
+}
+
+.close-music:hover {
+    transform: rotate(90deg);
+}
+
+.music-panel {
+    position: absolute;
+    left: 50%;
+    bottom: max(22px, env(safe-area-inset-bottom));
+
+    width: min(460px, calc(100% - 32px));
+
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+
+    transform: translate(-50%, 14px);
+    opacity: 0;
+    pointer-events: none;
+
+    transition:
+        opacity 0.3s ease,
+        transform 0.3s ease;
+}
+
+/* wait for the letters to gather before the controls appear */
+.app.music-open .music-panel {
+    opacity: 1;
+    transform: translate(-50%, 0);
+    pointer-events: auto;
+    transition-delay: 0.55s;
+}
+
+.music-eyebrow {
+    font-size: 9px;
+    letter-spacing: 0.13em;
+    text-align: center;
+}
+
+.music-now {
+    font-size: clamp(16px, 3.4vw, 22px);
+    font-weight: 400;
+    letter-spacing: 0.17em;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.music-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.music-btn {
+    min-width: 52px;
+    min-height: 44px;
+    padding: 6px 12px;
+
+    border: 0;
+    background-color: transparent;
+
+    font-size: 16px;
+    letter-spacing: 0.1em;
+
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.music-btn:hover {
+    transform: scale(1.14);
+}
+
+.music-play {
+    font-size: 24px;
+}
+
+.music-seek {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    color: var(--muted);
+    font-size: 10px;
+    font-variant-numeric: tabular-nums;
+}
+
+.music-seek span {
+    flex: 0 0 34px;
+}
+
+.music-seek span:last-child {
+    text-align: right;
+}
+
+.music-seek input[type="range"] {
+    flex: 1;
+    min-width: 0;
+    accent-color: var(--text);
+    cursor: pointer;
+}
+
+.music-volume {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+}
+
+.playlist {
+    list-style: none;
+    max-height: min(22dvh, 170px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--subtle) transparent;
+}
+
+.playlist::-webkit-scrollbar {
+    width: 4px;
+}
+
+.playlist::-webkit-scrollbar-thumb {
+    background: var(--subtle);
+}
+
+.playlist-item {
+    display: block;
+    width: 100%;
+    min-height: 34px;
+    padding: 7px 4px;
+
+    border: 0;
+    background-color: transparent;
+    color: var(--muted);
+
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.playlist-item:hover {
+    color: var(--text);
+}
+
+.playlist-item.active {
+    color: inherit;
+}
+
+.playlist-empty {
+    padding: 8px 4px;
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-align: center;
+}
+
+.music-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+
+    color: var(--muted);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+}
+
+.add-file {
+    min-height: 40px;
+    padding: 8px 4px;
+
+    border: 0;
+    background: transparent;
+    color: var(--text);
+
+    font-size: 9px;
+    letter-spacing: 0.08em;
+
+    cursor: pointer;
+}
+
+.add-file:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+/* =========================================================
+   SETTINGS OVERLAY
+   Minimal: no box. The letters from the buttons gather
+   into corner brackets around the content.
+========================================================= */
+
+.settings-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 25;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 32px 24px;
+
+    overflow: auto;
+    overscroll-behavior: contain;
+
+    background: rgba(0, 0, 0, 0.58);
+    -webkit-backdrop-filter: blur(7px);
+    backdrop-filter: blur(7px);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition:
+        opacity 0.25s ease,
+        visibility 0.25s ease;
+}
+
+.app[data-theme="light"] .settings-overlay {
+    background: rgba(236, 235, 230, 0.66);
+}
+
+.app.settings-open .settings-overlay {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.settings-panel {
+    position: relative;
+    flex: 0 0 auto;
+
+    width: min(var(--panel-width), 100%);
+    max-height: calc(100% - 12px);
+    max-height: calc(100dvh - 64px);
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    color: var(--text);
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+
+    opacity: 0;
+    transform: translateY(12px) scale(0.985);
+
+    transition:
+        opacity 0.28s ease,
+        transform 0.28s ease,
+        color 0.3s ease;
+}
+
+.app.settings-open .settings-panel {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    transition-delay: 0.18s;
+}
+
+/* =========================================================
+   SETTINGS HEADER
+========================================================= */
+
+.settings-header {
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    padding: 18px 22px 16px;
+    border-bottom: 0;
+}
+
+.settings-eyebrow {
+    margin-bottom: 8px;
+    font-size: 9px;
+    letter-spacing: 0.13em;
+}
+
+.settings-title {
+    font-size: clamp(21px, 4vw, 28px);
+    font-weight: 400;
+    letter-spacing: 0.17em;
+}
+
+.close-settings {
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+
+    display: grid;
+    place-items: center;
+
+    border: 0;
+    background: transparent;
+    color: var(--text);
+
+    font-size: 28px;
+    font-weight: 300;
+    line-height: 1;
+
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.close-settings:hover {
+    transform: rotate(90deg);
+}
+
+/* =========================================================
+   SETTINGS CONTENT
+========================================================= */
+
+.settings-content {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--subtle) transparent;
+}
+
+.settings-content::-webkit-scrollbar {
+    width: 5px;
+}
+
+.settings-content::-webkit-scrollbar-thumb {
+    background: var(--subtle);
+}
+
+.settings-section {
+    padding: 20px 22px;
+    border-bottom: 0;
+}
+
+.settings-section h3 {
+    margin-bottom: 12px;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.15em;
+}
+
+.setting-description {
+    margin-bottom: 17px;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+.setting-heading-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.setting-heading-row h3 {
+    margin-bottom: 0;
+}
+
+.setting-heading-row + .setting-description {
+    margin-top: 12px;
+}
+
+.control-label {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 11px;
+    color: var(--text);
+}
+
+.setting-hint {
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 10px;
+}
+
+/* =========================================================
+   DARK / LIGHT BUTTONS
+========================================================= */
+
+.mode-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.mode-button {
+    min-width: 0;
+    min-height: 68px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    border: 0;
+    border-bottom: 0;
+    background: transparent;
+    color: var(--muted);
+
+    font-size: 11px;
+    letter-spacing: 0.13em;
+
+    cursor: pointer;
+
+    transition:
+        color 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.mode-button:hover {
+    background: var(--control-bg);
+    color: var(--text);
+}
+
+.mode-button.active {
+    color: var(--text);
+    border-bottom-color: var(--text);
+}
+
+.mode-icon {
+    font-size: 21px;
+    line-height: 1;
+}
+
+/* =========================================================
+   SWITCH
+========================================================= */
+
+.switch {
+    position: relative;
+    flex: 0 0 auto;
+    width: 44px;
+    height: 24px;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.switch input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+.switch-track {
+    position: absolute;
+    inset: 0;
+
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: var(--control-hover);
+
+    transition: background 0.2s ease;
+}
+
+.switch-track::before {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+
+    width: 16px;
+    height: 16px;
+
+    border-radius: 50%;
+    background: var(--muted);
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease;
+}
+
+.switch input:checked + .switch-track {
+    background: var(--text);
+}
+
+.switch input:checked + .switch-track::before {
+    transform: translateX(20px);
+    background: var(--bg);
+}
+
+.switch input:focus-visible + .switch-track {
+    outline: 1px solid var(--text);
+    outline-offset: 4px;
+}
+
+/* =========================================================
+   RAINBOW SPEED
+========================================================= */
+
+.range-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.range-row input[type="range"] {
+    flex: 1;
+    min-width: 0;
+    accent-color: var(--text);
+    cursor: pointer;
+}
+
+.range-row output {
+    width: 35px;
+    flex: 0 0 35px;
+    text-align: right;
+    color: var(--text);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+}
+
+/* =========================================================
+   COLOR PICKERS
+========================================================= */
+
+.color-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px 10px;
+}
+
+.color-choice {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    color: var(--muted);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+}
+
+.color-choice input[type="color"] {
+    display: block;
+    width: 100%;
+    height: 34px;
+    min-width: 0;
+    padding: 3px;
+
+    border: 0;
+    border-radius: 0;
+    background: var(--control-bg);
+
+    cursor: pointer;
+}
+
+.rainbow-preview {
+    margin-top: 22px;
+    padding: 17px 8px;
+
+    border-top: 0;
+    border-bottom: 1px solid var(--border);
+
+    text-align: center;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    overflow-wrap: anywhere;
+}
+
+/* =========================================================
+   SETTINGS FOOTER
+========================================================= */
+
+.settings-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+
+    padding: 16px 22px;
+
+    color: var(--muted);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+}
+
+.reset-button {
+    min-height: 40px;
+    padding: 8px 4px;
+
+    border: 0;
+    background: transparent;
+    color: var(--text);
+
+    font-size: 9px;
+    letter-spacing: 0.08em;
+
+    cursor: pointer;
+}
+
+.reset-button:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* =========================================================
+   MOBILE / TOUCH
+========================================================= */
+
+@media (max-width: 700px) {
+    .stage {
+        width: 100%;
+        height: min(78vh, 640px);
+        height: min(78dvh, 640px);
+    }
+
+    .orbit-button {
+        min-width: 44px;
+        min-height: 44px;
+        padding: 6px 4px;
+        font-size: clamp(11px, 3.5vw, 15px);
+        letter-spacing: 0.02em;
+    }
+
+    .button-one {
+        top: 8%;
+    }
+
+    .button-two {
+        right: 3%;
+    }
+
+    .button-three {
+        bottom: 8%;
+    }
+
+    .button-four {
+        left: 3%;
+    }
+
+    .button-five {
+        top: 22%;
+        left: 10%;
+    }
+
+    .button-six {
+        top: 22%;
+        right: 10%;
+    }
+
+    .button-seven {
+        right: 8%;
+        bottom: 22%;
+    }
+
+    .button-eight {
+        bottom: 22%;
+        left: 10%;
+    }
+
+    .title {
+        font-size: clamp(22px, 6vw, 30px);
+    }
+
+    .scramble-line {
+        font-size: 7px;
+    }
+
+    .corner {
+        top: max(17px, env(safe-area-inset-top));
+        left: 16px;
+        font-size: 8px;
+    }
+
+    .status {
+        top: max(17px, env(safe-area-inset-top));
+        right: 16px;
+        font-size: 8px;
+    }
+
+    .bottom-scramble {
+        bottom: max(17px, env(safe-area-inset-bottom));
+        max-width: 90vw;
+        font-size: 7px;
+        letter-spacing: 0.12em;
+    }
+
+    /* Music */
+    .music-panel {
+        gap: 10px;
+        width: calc(100% - 28px);
+        bottom: max(14px, env(safe-area-inset-bottom));
+    }
+
+    .music-eyebrow {
+        font-size: 8px;
+    }
+
+    .playlist {
+        max-height: min(17dvh, 130px);
+    }
+
+    /* Settings */
+    .settings-overlay {
+        align-items: center;
+        justify-content: center;
+        padding: 26px 22px;
+        padding-top: max(26px, env(safe-area-inset-top));
+        padding-bottom: max(26px, env(safe-area-inset-bottom));
+    }
+
+    .settings-panel {
+        width: 100%;
+        max-width: 420px;
+        max-height: calc(100dvh - 52px);
+    }
+
+    .settings-header {
+        padding: 15px 14px 13px;
+        gap: 12px;
+    }
+
+    .settings-eyebrow {
+        font-size: 8px;
+        letter-spacing: 0.09em;
+    }
+
+    .settings-title {
+        font-size: 23px;
+    }
+
+    .settings-section {
+        padding: 16px 14px;
+    }
+
+    .settings-section h3 {
+        font-size: 10px;
+    }
+
+    .setting-description {
+        font-size: 11px;
+        line-height: 1.65;
+    }
+
+    .mode-button {
+        min-height: 62px;
+        font-size: 11px;
+    }
+
+    .color-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 15px 12px;
+    }
+
+    .color-choice input[type="color"] {
+        height: 39px;
+    }
+
+    .rainbow-preview {
+        font-size: 10px;
+        line-height: 1.8;
+    }
+
+    .settings-footer {
+        padding: 14px;
+        font-size: 8px;
+    }
+}
+
+/* Phones on their side */
+@media (max-height: 480px) and (orientation: landscape) {
+    .stage {
+        width: min(720px, 94vw);
+        height: 90vh;
+        height: 90dvh;
+    }
+
+    .orbit-button {
+        min-height: 36px;
+        font-size: 13px;
+    }
+
+    .title {
+        font-size: 22px;
+    }
+
+    .bottom-scramble {
+        display: none;
+    }
+
+    .music-panel {
+        gap: 6px;
+        bottom: 8px;
+    }
+
+    .music-eyebrow {
+        display: none;
+    }
+
+    .playlist {
+        max-height: 70px;
+    }
+
+    .music-btn {
+        min-height: 36px;
+    }
+}
+
+/* Short mobile screens */
+@media (max-width: 700px) and (max-height: 620px) {
+    .settings-overlay {
+        align-items: flex-start;
+    }
+
+    .settings-panel {
+        max-height: calc(100dvh - 52px);
+        margin: auto 0;
+    }
+
+    .settings-section {
+        padding-top: 14px;
+        padding-bottom: 14px;
+    }
+
+    .settings-header {
+        padding-top: 13px;
+        padding-bottom: 13px;
+    }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+
+/* =========================================================
+   SETTINGS POLISH — compact layout + elastic hover
+   Appended overrides preserve the original monochrome /
+   rainbow visual identity and leave the main menu untouched.
+========================================================= */
+
+.settings-panel {
+    width: min(390px, 100%);
+}
+
+.settings-header {
+    padding: 15px 18px 13px;
+}
+
+.settings-section {
+    padding: 15px 18px;
+}
+
+.setting-description {
+    margin-bottom: 12px;
+    line-height: 1.55;
+}
+
+.settings-section h3 {
+    margin-bottom: 9px;
+}
+
+.mode-options {
+    gap: 8px;
+}
+
+.mode-button {
+    min-height: 56px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    background: var(--control-bg);
+    transform-origin: center;
+    will-change: transform;
+}
+
+.mode-button.active {
+    border-color: var(--text);
+    background: var(--control-hover);
+}
+
+.settings-footer {
+    padding: 12px 18px 15px;
+}
+
+.close-settings,
+.reset-button,
+.mode-button {
+    -webkit-tap-highlight-color: transparent;
+}
+
+.close-settings:hover,
+.close-settings:focus-visible {
+    color: var(--text);
+}
+
+.reset-button {
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    background: var(--control-bg);
+    text-decoration: none;
+    transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.reset-button:hover,
+.reset-button:focus-visible {
+    border-color: var(--text);
+    background: var(--control-hover);
+    text-decoration: none;
+}
+
+.settings-button-wiggle {
+    animation: settingsButtonWiggle 620ms both;
+}
+
+@keyframes settingsButtonWiggle {
+    0%   { transform: translateY(0) rotate(0deg) scale(1); }
+    18%  { transform: translateY(-5px) rotate(-2deg) scale(1.045); }
+    34%  { transform: translateY(2px) rotate(2deg) scale(1.025); }
+    50%  { transform: translateY(-3px) rotate(-1.4deg) scale(1.04); }
+    68%  { transform: translateY(1px) rotate(1deg) scale(1.015); }
+    84%  { transform: translateY(-1px) rotate(-0.4deg) scale(1.008); }
+    100% { transform: translateY(0) rotate(0deg) scale(1); }
+}
+
+/* Subtle, continuous elastic response while the pointer remains over a control. */
+.mode-button:hover,
+.mode-button:focus-visible {
+    color: var(--text);
+    border-color: var(--text);
+    background: var(--control-hover);
+    animation: settingsButtonWiggle 620ms both;
+}
+
+.close-settings:hover {
+    animation: settingsCloseWiggle 500ms both;
+}
+
+@keyframes settingsCloseWiggle {
+    0%   { transform: rotate(0deg) scale(1); }
+    55%  { transform: rotate(100deg) scale(1.12); }
+    78%  { transform: rotate(82deg) scale(1.06); }
+    100% { transform: rotate(90deg) scale(1); }
+}
+
+.reset-button:hover,
+.reset-button:focus-visible {
+    animation: settingsButtonWiggle 620ms both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .settings-button-wiggle,
+    .mode-button:hover,
+    .mode-button:focus-visible,
+    .close-settings:hover,
+    .reset-button:hover,
+    .reset-button:focus-visible {
+        animation: none !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .settings-overlay {
+        padding: 18px 14px;
+    }
+
+    .settings-header {
+        padding: 13px 14px 12px;
+    }
+
+    .settings-section {
+        padding: 13px 14px;
+    }
+
+    .settings-footer {
+        padding: 12px 14px;
+    }
+
+    .color-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px 8px;
+    }
+}
+
+
+
+/* =========================================================
+   REFINED SWARM CONTROLS — compact, quiet, and atmospheric
+========================================================= */
+.orbit-button .scrambled { letter-spacing: 0.12em; font-size: 0.88em; }
+.orbit-button:hover .real-label,
+.orbit-button:focus-visible .real-label,
+.orbit-button.revealed .real-label { transform: scale(1.16); }
+.orbit-button .real-label { transition: opacity .22s ease, transform .28s cubic-bezier(.22,1,.36,1); }
+
+.music-note-orbit {
+    position: relative;
+    width: 1.7em;
+    height: 1.7em;
+    display: inline-block;
+    transform: none !important;
+}
+.music-note-orbit span {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    display: block;
+    line-height: 1;
+    transform-origin: 0 0;
+}
+.music-note-orbit span:nth-child(1) { animation: noteOrbitOne 3.6s linear infinite; }
+.music-note-orbit span:nth-child(2) { animation: noteOrbitTwo 3.6s linear infinite; }
+.music-note-orbit span:nth-child(3) { animation: noteOrbitThree 3.6s linear infinite; }
+.orbit-button:not(:hover):not(:focus-visible):not(.revealed) .music-note-orbit span { animation-play-state: paused; }
+@keyframes noteOrbitOne {
+    from { transform: translate(-50%,-50%) rotate(0deg) translateX(.48em) rotate(0deg); }
+    to { transform: translate(-50%,-50%) rotate(360deg) translateX(.48em) rotate(-360deg); }
+}
+@keyframes noteOrbitTwo {
+    from { transform: translate(-50%,-50%) rotate(120deg) translateX(.48em) rotate(-120deg); }
+    to { transform: translate(-50%,-50%) rotate(480deg) translateX(.48em) rotate(-480deg); }
+}
+@keyframes noteOrbitThree {
+    from { transform: translate(-50%,-50%) rotate(240deg) translateX(.48em) rotate(-240deg); }
+    to { transform: translate(-50%,-50%) rotate(600deg) translateX(.48em) rotate(-600deg); }
+}
+
+/* Animated gradient typography throughout the controls. */
+.settings-panel h3,
+.settings-panel .setting-description,
+.settings-panel .control-label,
+.settings-panel .setting-hint,
+.settings-panel .mode-button,
+.settings-panel .mode-icon,
+.settings-panel .color-choice,
+.settings-panel .settings-footer,
+.settings-panel .reset-button,
+.music-seek,
+.music-footer,
+.playlist-item,
+.add-file {
+    background-image: linear-gradient(90deg, var(--rainbow-gradient));
+    background-size: 500% 100%;
+    background-position: 0% 50%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: rainbowCycle var(--rainbow-speed) linear infinite;
+}
+.app.rainbow-disabled .settings-panel h3,
+.app.rainbow-disabled .settings-panel .setting-description,
+.app.rainbow-disabled .settings-panel .control-label,
+.app.rainbow-disabled .settings-panel .setting-hint,
+.app.rainbow-disabled .settings-panel .mode-button,
+.app.rainbow-disabled .settings-panel .mode-icon,
+.app.rainbow-disabled .settings-panel .color-choice,
+.app.rainbow-disabled .settings-panel .settings-footer,
+.app.rainbow-disabled .settings-panel .reset-button,
+.app.rainbow-disabled .music-seek,
+.app.rainbow-disabled .music-footer,
+.app.rainbow-disabled .playlist-item,
+.app.rainbow-disabled .add-file {
+    animation: none;
+    background-image: none;
+    -webkit-text-fill-color: var(--muted);
+}
+
+/* Lower visual weight and simpler, inline setting actions. */
+.settings-section { padding: 16px 20px; }
+.settings-section h3 { font-size: 10px; letter-spacing: .12em; }
+.setting-description { margin-bottom: 12px; line-height: 1.55; }
+.mode-options { gap: 8px; }
+.mode-button {
+    min-height: 48px;
+    flex-direction: row;
+    gap: 9px;
+    border: 1px solid transparent;
+    border-bottom-color: var(--border);
+    font-size: 10px;
+    letter-spacing: .1em;
+}
+.mode-button:hover,
+.mode-button.active {
+    background: var(--control-bg);
+    border-color: var(--border);
+    border-bottom-color: var(--text);
+}
+.mode-icon { font-size: 16px; }
+.switch { width: 38px; height: 21px; }
+.switch-track::before { width: 13px; height: 13px; }
+.switch input:checked + .switch-track::before { transform: translateX(17px); }
+.color-grid { gap: 10px 8px; }
+.color-choice input[type="color"] { height: 28px; border-radius: 3px; }
+.settings-footer { padding: 12px 20px; }
+.reset-button,
+.add-file {
+    min-height: 32px;
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    transition: background .2s ease, border-color .2s ease, transform .2s ease;
+}
+.reset-button:hover,
+.add-file:hover {
+    background: var(--control-bg);
+    border-color: var(--muted);
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+/* Minimal audio rails with a slim rainbow track and precise thumb. */
+.music-seek input[type="range"],
+.range-row input[type="range"] {
+    appearance: none;
+    -webkit-appearance: none;
+    height: 16px;
+    background: transparent;
+    accent-color: var(--text);
+}
+.music-seek input[type="range"]::-webkit-slider-runnable-track,
+.range-row input[type="range"]::-webkit-slider-runnable-track {
+    height: 2px;
+    border-radius: 99px;
+    background: linear-gradient(90deg, var(--rainbow-gradient));
+    background-size: 300% 100%;
+    animation: rainbowCycle var(--rainbow-speed) linear infinite;
+}
+.music-seek input[type="range"]::-moz-range-track,
+.range-row input[type="range"]::-moz-range-track {
+    height: 2px;
+    border-radius: 99px;
+    background: linear-gradient(90deg, var(--rainbow-gradient));
+    background-size: 300% 100%;
+}
+.music-seek input[type="range"]::-webkit-slider-thumb,
+.range-row input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 9px;
+    height: 9px;
+    margin-top: -3.5px;
+    border: 1px solid var(--text);
+    border-radius: 50%;
+    background: var(--bg);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--text) 10%, transparent);
+}
+.music-seek input[type="range"]::-moz-range-thumb,
+.range-row input[type="range"]::-moz-range-thumb {
+    width: 8px;
+    height: 8px;
+    border: 1px solid var(--text);
+    border-radius: 50%;
+    background: var(--bg);
+}
+.app.rainbow-disabled .music-seek input[type="range"]::-webkit-slider-runnable-track,
+.app.rainbow-disabled .range-row input[type="range"]::-webkit-slider-runnable-track,
+.app.rainbow-disabled .music-seek input[type="range"]::-moz-range-track,
+.app.rainbow-disabled .range-row input[type="range"]::-moz-range-track {
+    background: var(--muted);
+    animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+    .music-note-orbit span,
+    .settings-panel h3,
+    .settings-panel .setting-description,
+    .settings-panel .control-label,
+    .settings-panel .setting-hint,
+    .settings-panel .mode-button,
+    .settings-panel .mode-icon,
+    .settings-panel .color-choice,
+    .settings-panel .settings-footer,
+    .settings-panel .reset-button,
+    .music-seek,
+    .music-footer,
+    .playlist-item,
+    .add-file,
+    .music-seek input[type="range"]::-webkit-slider-runnable-track,
+    .range-row input[type="range"]::-webkit-slider-runnable-track {
+        animation: none !important;
+    }
+}
+
+
+/* Requested refinements: clean settings, larger touch targets, responsive sizing. */
+.settings-panel {
+    width: min(460px, 100%);
+}
+
+.settings-header {
+    padding: 20px 22px 18px;
+    border-bottom: 0;
+}
+
+.settings-section {
+    padding: 20px 22px;
+    border-bottom: 0;
+}
+
+.settings-section h3 {
+    font-size: 11px;
+}
+
+.setting-description,
+.setting-hint,
+.settings-panel .control-label {
+    font-size: 12px;
+}
+
+.mode-button,
+.mode-button:hover,
+.mode-button.active {
+    min-height: 54px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+.mode-button:hover,
+.mode-button:focus-visible,
+.mode-button.active {
+    color: var(--text);
+    background: transparent;
+}
+
+.settings-footer {
+    padding: 16px 22px 20px;
+}
+
+.reset-button,
+.reset-button:hover,
+.reset-button:focus-visible {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    padding: 10px 0;
+}
+
+.color-choice input[type="color"] {
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+.rainbow-preview {
+    border: 0;
+    padding: 16px 8px 4px;
+}
+
+.settings-content {
+    scrollbar-width: none;
+}
+.settings-content::-webkit-scrollbar {
+    display: none;
+}
+
+.settings-button .real-label {
+    font-size: 26px;
+    line-height: 1;
+    transition: transform .22s ease, color .22s ease;
+}
+
+.settings-button:hover .real-label,
+.settings-button:focus-visible .real-label,
+.settings-button.revealed .real-label {
+    transform: scale(1.5);
+}
+
+.music-note-orbit {
+    width: 2em;
+    height: 2em;
+    font-size: 1.12em;
+}
+.music-note-orbit span {
+    font-size: 1.05em;
+}
+.music-note-orbit span:nth-child(1) { animation-duration: 2.8s; }
+.music-note-orbit span:nth-child(2) { animation-duration: 2.8s; }
+.music-note-orbit span:nth-child(3) { animation-duration: 2.8s; }
+
+.music-now {
+    font-size: clamp(18px, 3.8vw, 25px);
+}
+.music-btn {
+    min-width: 58px;
+    min-height: 50px;
+    font-size: 18px;
+}
+.music-play {
+    font-size: 27px;
+}
+.playlist-item {
+    min-height: 40px;
+    padding: 9px 4px;
+    font-size: 12px;
+}
+
+@media (max-width: 700px) {
+    .settings-overlay {
+        padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+    }
+    .settings-panel {
+        width: 100%;
+        max-height: calc(100dvh - 32px);
+    }
+    .settings-header {
+        padding: 18px 16px 14px;
+    }
+    .settings-section {
+        padding: 18px 16px;
+    }
+    .settings-footer {
+        padding: 14px 16px 18px;
+    }
+    .settings-title {
+        font-size: clamp(23px, 6vw, 29px);
+    }
+    .setting-description,
+    .setting-hint,
+    .settings-panel .control-label {
+        font-size: 13px;
+    }
+    .mode-button {
+        min-height: 52px;
+        font-size: 12px;
+    }
+    .color-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px 10px;
+    }
+    .color-choice {
+        font-size: 10px;
+    }
+    .music-panel {
+        width: calc(100% - 28px);
+        bottom: max(16px, env(safe-area-inset-bottom));
+        gap: 12px;
+    }
+    .music-now {
+        font-size: clamp(18px, 5vw, 24px);
+    }
+    .music-seek {
+        gap: 8px;
+        font-size: 11px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .settings-button .real-label,
+    .music-note-orbit span {
+        transition: none;
+        animation: none !important;
+    }
+}
+
+
+/* Requested audio control transparency and fuller PS3-style ribbon */
+.music-seek input[type="range"] {
+    opacity: 0.48;
+    transition: opacity 0.2s ease;
+}
+.music-seek input[type="range"]:hover,
+.music-seek input[type="range"]:focus-visible {
+    opacity: 0.78;
+}
+.music-seek input[type="range"]::-webkit-slider-runnable-track {
+    background: rgba(160, 170, 190, 0.20);
+}
+.music-seek input[type="range"]::-moz-range-track {
+    background: rgba(160, 170, 190, 0.20);
+}
+
+/* Agar-style prototype opened by VIDEO */
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Requested interaction polish */
+.orbit-button[data-label="ART"] .real-label,
+.orbit-button[data-label="CONTACT"] .real-label,
+.orbit-button[data-label="ABOUT"] .real-label,
+.orbit-button[data-label="WRITING"] .real-label,
+.orbit-button[data-label="LINKS"] .real-label {
+  font-size: 25px;
+  animation: questionWave 1.8s ease-in-out infinite;
+  text-shadow: 0 0 14px rgba(255,255,255,.18);
+}
+.orbit-button[data-label="ART"] .scrambled,
+.orbit-button[data-label="CONTACT"] .scrambled,
+.orbit-button[data-label="ABOUT"] .scrambled,
+.orbit-button[data-label="WRITING"] .scrambled,
+.orbit-button[data-label="LINKS"] .scrambled {
+  font-size: 25px;
+}
+@keyframes questionWave {
+  0%,100% { transform: translateY(0) rotate(-7deg); opacity:.58; }
+  50% { transform: translateY(-7px) rotate(7deg); opacity:1; }
+}
+.music-note-orbit { position:relative; display:inline-block; width:34px; height:34px; opacity:0; }
+.music-note-orbit span { position:absolute; left:50%; top:50%; transform-origin:0 0; font-size:19px; }
+.music-note-orbit span:nth-child(1) { transform:rotate(0deg) translate(10px,-50%); }
+.music-note-orbit span:nth-child(2) { transform:rotate(120deg) translate(10px,-50%); }
+.music-note-orbit span:nth-child(3) { transform:rotate(240deg) translate(10px,-50%); }
+#musicButton:hover .music-note-orbit,
+#musicButton:focus-visible .music-note-orbit,
+#musicButton.revealed .music-note-orbit { opacity:1; animation: notesOrbit 3s linear infinite; }
+#musicButton:hover .real-label, #musicButton:focus-visible .real-label, #musicButton.revealed .real-label { opacity:1; }
+@keyframes notesOrbit { to { transform:rotate(360deg); } }
+
+
+
+
+
+@media (prefers-reduced-motion: reduce) {
+ .orbit-button[data-label] .real-label, #musicButton:hover .music-note-orbit { animation:none; }
+}
+
+
+/* =========================================================
+   GAME LOBBY + LETTER-CLUSTER PLAYER IDENTITY
+========================================================= */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Final interaction pass: unknown destinations stay scrambled until revealed. */
+.orbit-button[data-label="ART"] .real-label,
+.orbit-button[data-label="CONTACT"] .real-label,
+.orbit-button[data-label="ABOUT"] .real-label,
+.orbit-button[data-label="WRITING"] .real-label,
+.orbit-button[data-label="LINKS"] .real-label {
+  animation: none !important;
+  opacity: 0;
+  transform: none;
+}
+.orbit-button[data-label="ART"] .scrambled,
+.orbit-button[data-label="CONTACT"] .scrambled,
+.orbit-button[data-label="ABOUT"] .scrambled,
+.orbit-button[data-label="WRITING"] .scrambled,
+.orbit-button[data-label="LINKS"] .scrambled { animation: rainbowCycle var(--rainbow-speed) linear infinite; }
+.orbit-button[data-label="ART"]:hover .real-label,
+.orbit-button[data-label="CONTACT"]:hover .real-label,
+.orbit-button[data-label="ABOUT"]:hover .real-label,
+.orbit-button[data-label="WRITING"]:hover .real-label,
+.orbit-button[data-label="LINKS"]:hover .real-label,
+.orbit-button[data-label="ART"]:focus-visible .real-label,
+.orbit-button[data-label="CONTACT"]:focus-visible .real-label,
+.orbit-button[data-label="ABOUT"]:focus-visible .real-label,
+.orbit-button[data-label="WRITING"]:focus-visible .real-label,
+.orbit-button[data-label="LINKS"]:focus-visible .real-label,
+.orbit-button[data-label="ART"].revealed .real-label,
+.orbit-button[data-label="CONTACT"].revealed .real-label,
+.orbit-button[data-label="ABOUT"].revealed .real-label,
+.orbit-button[data-label="WRITING"].revealed .real-label,
+.orbit-button[data-label="LINKS"].revealed .real-label { opacity: 1; }
+.orbit-button[data-label="ART"]:hover .scrambled,
+.orbit-button[data-label="CONTACT"]:hover .scrambled,
+.orbit-button[data-label="ABOUT"]:hover .scrambled,
+.orbit-button[data-label="WRITING"]:hover .scrambled,
+.orbit-button[data-label="LINKS"]:hover .scrambled,
+.orbit-button[data-label="ART"]:focus-visible .scrambled,
+.orbit-button[data-label="CONTACT"]:focus-visible .scrambled,
+.orbit-button[data-label="ABOUT"]:focus-visible .scrambled,
+.orbit-button[data-label="WRITING"]:focus-visible .scrambled,
+.orbit-button[data-label="LINKS"]:focus-visible .scrambled,
+.orbit-button[data-label="ART"].revealed .scrambled,
+.orbit-button[data-label="CONTACT"].revealed .scrambled,
+.orbit-button[data-label="ABOUT"].revealed .scrambled,
+.orbit-button[data-label="WRITING"].revealed .scrambled,
+.orbit-button[data-label="LINKS"].revealed .scrambled { opacity: 0; }
+
+/* Music glyphs travel around a circular path, with each note staying upright. */
+#musicButton .music-note-orbit { position:relative; display:inline-block; width:36px; height:36px; opacity:0; transform:none; }
+#musicButton .music-note-orbit span { position:absolute; font-size:19px; line-height:1; transform:translate(-50%,-50%); }
+#musicButton .music-note-orbit span:nth-child(1) { left:50%; top:16%; }
+#musicButton .music-note-orbit span:nth-child(2) { left:80%; top:67%; }
+#musicButton .music-note-orbit span:nth-child(3) { left:20%; top:67%; }
+#musicButton:hover .music-note-orbit,
+#musicButton:focus-visible .music-note-orbit,
+#musicButton.revealed .music-note-orbit { opacity:1; animation: notesOrbit 3.6s linear infinite; }
+@keyframes notesOrbit { to { transform:rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+ #musicButton .music-note-orbit { animation:none !important; }
+}
+
+
+/* Focused gameplay polish: readable glyphs and a compact, understated lobby. */
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================================
+   GAME — language/font lobby fields + toast (game.js)
+   Appended only; main menu styles above are untouched.
+========================================================= */
+
+
+
+
+
+
+
+/* =========================================================
+   GAME — split button, touch / mobile polish
+========================================================= */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================================
+   PAGE TRANSITIONS  (VIDEO + WORDS)
+   Same hand-off as music / settings: the menu hides while the
+   swirling letters travel, the page fades in underneath them.
+========================================================= */
+.app.page-active .orbit-button {
+    pointer-events: none;
+    opacity: 0;
+}
+.app.page-active .title {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.15);
+}
+.app.page-active .scramble-line,
+.app.page-active .orbit-mark,
+.app.page-active .bottom-scramble {
+    opacity: 0;
+}
+.app.page-active #boidCanvas { opacity: 0; }
+
+/* letters must be seen above the game / word pages while they swirl */
+.app.page-transitioning #settingsParticleCanvas {
+    opacity: 1;
+    z-index: 60;
+}
+.bottom-scramble { transition: opacity .3s ease; }
+
+/* =========================================================
+   WORDS PAGE  (words.js)
+   Search box with a shifting rainbow border, words that fall
+   and can be dragged, and the etymology card underneath.
+========================================================= */
+.word-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 25;
+    overflow: hidden;
+    color: var(--text);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity .45s ease, visibility 0s linear .45s;
+
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+}
+.word-overlay.word-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    /* wait for the menu letters to reach the search box, then fade up */
+    transition: opacity .65s ease .35s, visibility 0s linear 0s;
+}
+
+.close-word {
+    position: absolute;
+    top: max(14px, env(safe-area-inset-top));
+    right: max(18px, env(safe-area-inset-right));
+    z-index: 40;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    background-color: transparent;
+    font-size: 30px;
+    font-weight: 300;
+    line-height: 1;
+    cursor: pointer;
+    transition: transform .2s ease;
+}
+.close-word:hover { transform: rotate(90deg); }
+
+.word-clear {
+    position: absolute;
+    top: max(24px, calc(env(safe-area-inset-top) + 10px));
+    left: max(24px, env(safe-area-inset-left));
+    z-index: 40;
+    padding: 8px 4px;
+    border: 0;
+    background: transparent;
+    font-size: 9px;
+    letter-spacing: .15em;
+    cursor: pointer;
+    transition: transform .2s ease;
+}
+.word-clear:hover { transform: translateY(-2px); }
+
+/* the layer the words live in */
+.word-field {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    pointer-events: none;      /* only the words themselves catch the pointer */
+}
+
+.word-panel {
+    position: absolute;
+    left: 50%;
+    top: 46%;
+    z-index: 5;
+    width: min(520px, calc(100% - 32px));
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+.word-eyebrow {
+    margin-bottom: 14px;
+    font-size: 9px;
+    letter-spacing: .15em;
+}
+
+/* search box: shifting rainbow border, plain text inside */
+.word-search {
+    position: relative;
+    height: 58px;
+    border: 2px solid transparent;
+    border-radius: 14px;
+    background:
+        linear-gradient(var(--bg), var(--bg)) padding-box,
+        linear-gradient(90deg, var(--rainbow-gradient)) border-box;
+    background-origin: border-box;
+    background-size: 100% 100%, 500% 100%;
+    background-position: 0 0, 0% 50%;
+    animation: wordBorderCycle var(--rainbow-speed) linear infinite;
+    transition: box-shadow .25s ease, transform .25s ease;
+}
+.word-search:focus-within {
+    transform: scale(1.015);
+    box-shadow: 0 0 34px var(--control-hover);
+}
+@keyframes wordBorderCycle {
+    from { background-position: 0 0, 0% 50%; }
+    to   { background-position: 0 0, 500% 50%; }
+}
+.app.rainbow-disabled .word-search {
+    animation: none;
+    background:
+        linear-gradient(var(--bg), var(--bg)) padding-box,
+        linear-gradient(var(--text), var(--text)) border-box;
+}
+
+.word-search input {
+    width: 100%;
+    height: 100%;
+    padding: 0 20px;
+    border: 0;
+    border-radius: 12px;
+    outline: none;
+    background: transparent;
+    color: var(--text);              /* white in dark mode */
+    caret-color: var(--text);
+    font-size: 18px;                 /* 16px+ so phones don't zoom in */
+    letter-spacing: .05em;
+    text-align: center;
+    -webkit-user-select: text;
+    user-select: text;
+}
+.word-search input::placeholder {
+    color: var(--muted);
+    letter-spacing: .12em;
+}
+
+.word-hint {
+    margin-top: 14px;
+    color: var(--muted);
+    font-size: 8px;
+    letter-spacing: .16em;
+    transition: opacity .25s ease;
+}
+.word-panel.ety-on .word-hint { opacity: 0; }
+
+/* etymology card: sits right under the search box */
+.word-ety {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    margin-top: 16px;
+    padding: 4px 6px 0;
+    text-align: left;
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+    transition: opacity .25s ease, transform .25s ease;
+}
+.word-ety.show { opacity: 1; transform: none; }
+
+.word-ety-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 14px;
+}
+.word-ety-word {
+    font-size: 20px;
+    font-weight: 400;
+    letter-spacing: .06em;
+    overflow-wrap: anywhere;
+}
+.word-ety-meta {
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: .08em;
+}
+.word-ety-meaning {
+    margin-top: 6px;
+    color: var(--text);
+    font-size: 11px;
+    line-height: 1.6;
+    opacity: .82;
+}
+.word-ety-meaning:empty { display: none; }
+.word-ety-label {
+    margin-top: 14px;
+    color: var(--muted);
+    font-size: 8px;
+    letter-spacing: .2em;
+}
+.word-ety-body {
+    margin-top: 5px;
+    font-size: 12px;
+    line-height: 1.75;
+    letter-spacing: .01em;
+}
+.word-ety-source {
+    margin-top: 10px;
+    color: var(--subtle);
+    font-size: 7px;
+    letter-spacing: .18em;
+}
+.word-ety-source:empty { display: none; }
+.word-ety.loading .word-ety-label::after {
+    content: "";
+    animation: wordTrace 1.1s steps(4, end) infinite;
+}
+.word-ety.empty .word-ety-body { color: var(--muted); }
+@keyframes wordTrace {
+    0%   { content: ""; }
+    25%  { content: " ."; }
+    50%  { content: " . ."; }
+    75%  { content: " . . ."; }
+}
+
+/* a word. The outer element is moved by JS; the inner one gets the look */
+.word-chip {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 10;
+    cursor: grab;
+    pointer-events: auto;
+    touch-action: none;
+    will-change: transform;
+    transition: opacity .3s ease;
+}
+.word-chip.leaving { opacity: 0; pointer-events: none; }
+.word-chip.dragging { cursor: grabbing; }
+
+.word-chip-inner {
+    position: relative;
+    isolation: isolate;
+    padding: 6px 14px 8px;
+    border-radius: 12px;
+    color: var(--text);              /* white words in dark mode */
+    font-size: clamp(20px, 5.4vw, 30px);
+    letter-spacing: .03em;
+    line-height: 1.2;
+    white-space: nowrap;
+    background: transparent;
+    transition: transform .18s cubic-bezier(.22, 1, .36, 1), background-color .18s ease;
+}
+.word-chip-inner.spawned { animation: wordPop .42s cubic-bezier(.22, 1, .36, 1) backwards; }
+@keyframes wordPop {
+    from { opacity: 0; transform: scale(.6); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+/* highlighted rainbow border while you hold it */
+.word-chip-inner::before,
+.word-chip-inner::after {
+    content: "";
+    position: absolute;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .15s ease;
+    background-image: linear-gradient(90deg, var(--rainbow-gradient));
+    background-size: 500% 100%;
+    animation: rainbowCycle var(--rainbow-speed) linear infinite;
+}
+.word-chip-inner::before {
+    inset: 0;
+    padding: 2px;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+.word-chip-inner::after {
+    inset: -3px;
+    z-index: -1;
+    filter: blur(13px);
+}
+.word-chip.dragging .word-chip-inner {
+    transform: scale(1.07);
+    background-color: rgba(var(--fade-rgb), .78);
+}
+.word-chip.dragging .word-chip-inner::before { opacity: 1; }
+.word-chip.dragging .word-chip-inner::after  { opacity: .5; }
+.app.rainbow-disabled .word-chip-inner::before,
+.app.rainbow-disabled .word-chip-inner::after {
+    animation: none;
+    background-image: none;
+    background-color: var(--text);
+}
+
+@media (max-width: 600px) {
+    .word-panel { top: 38%; }
+    .word-search { height: 54px; }
+    .word-ety-body { font-size: 11px; line-height: 1.65; }
+}
+@media (max-height: 560px) {
+    .word-panel { top: 30%; }
+    .word-eyebrow { margin-bottom: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .word-search,
+    .word-chip-inner::before,
+    .word-chip-inner::after { animation: none; }
+    .word-chip-inner.spawned { animation: none; }
+}
+
+/* Sources and video: responsive, accessible reading surfaces */
+.sources-overlay,.video-overlay{position:fixed;inset:0;z-index:45;background:var(--bg);color:var(--text);display:none;overflow:auto;overscroll-behavior:contain}.sources-overlay.open,.video-overlay.open{display:block}.sources-header,.video-overlay header{display:flex;justify-content:space-between;align-items:center;padding:18px 24px;border-bottom:1px solid var(--border)}.sources-header h2{font-size:22px;letter-spacing:.16em;font-weight:400}.sources-kicker{font-size:10px;margin-bottom:8px}.sources-overlay button,.video-overlay button{border:1px solid var(--border);background:var(--control-bg);padding:9px 13px;cursor:pointer;color:var(--text)}#closeSources,#videoClose{font-size:24px}.sources-layout{display:grid;grid-template-columns:minmax(220px,270px) minmax(0,1fr);height:calc(100dvh - 85px)}.sources-sidebar{padding:18px;border-right:1px solid var(--border);overflow:auto;display:flex;flex-direction:column;gap:12px}.sources-sidebar label,.source-tools label{font-size:10px;letter-spacing:.1em}.sources-sidebar input,.source-tools select{padding:12px;background:var(--control-bg);color:var(--text);border:1px solid var(--border);width:100%;min-width:0}.source-list{display:flex;flex-direction:column;gap:5px;overflow:auto;max-height:50vh}.source-list button{text-align:left;overflow-wrap:anywhere}.source-list button.active{border-color:var(--text)}.source-add{cursor:pointer;padding:13px;border:1px dashed var(--border)}.source-note{font-size:11px;color:var(--muted);line-height:1.6}.source-main{display:flex;flex-direction:column;min-height:0;min-width:0}.source-toolbar,.source-tools{padding:12px 18px;display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--border);font-size:11px}.source-toolbar>span{max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.source-viewport{position:relative;overflow:auto;flex:1;min-height:180px;padding:24px;text-align:center;background:var(--panel-bg)}.source-page{position:relative;margin:0 auto;max-width:850px;line-height:0}.source-page img,.source-page canvas{width:100%;height:auto;display:block}.source-text{max-width:850px;margin:auto;text-align:left;line-height:1.85;white-space:pre-wrap;overflow-wrap:anywhere}.source-word{cursor:pointer;line-height:inherit;border-radius:2px}.source-word.selected{background:#e6c04b;color:#111}.source-word:hover{outline:1px solid var(--muted)}.source-pdf-text{position:absolute;inset:0;text-align:left;overflow:hidden}.source-pdf-text .source-word{position:absolute;white-space:pre;transform-origin:0 0;color:transparent;line-height:1}.source-pdf-text .source-word.selected{color:#111}.source-definition{padding:14px 18px;min-height:66px;max-height:25vh;overflow:auto;border-top:1px solid var(--border);font-size:12px;line-height:1.6}.source-tools select{width:auto;max-width:180px}.source-tools button{font-size:10px}#sourceFeedback{font-size:10px;color:var(--muted)}.video-overlay header{gap:15px}.video-overlay header div{display:flex;gap:8px}#videoFrame{width:min(1100px,94vw);aspect-ratio:16/9;margin:6vh auto 15px}#videoFrame iframe{width:100%;height:100%;border:0}.video-overlay p{text-align:center;color:var(--muted);font-size:11px;padding:10px}@media(max-width:700px){.sources-layout{display:flex;flex-direction:column;height:calc(100dvh - 76px)}.sources-sidebar{flex:none;max-height:28vh;border-right:0;border-bottom:1px solid var(--border);padding:10px;gap:7px}.source-list{flex-direction:row;overflow-x:auto;max-height:60px}.source-list button{min-width:140px}.source-note{display:none}.source-main{flex:1;min-height:0}.source-viewport{padding:8px}.source-toolbar,.source-tools{padding:8px;gap:6px}.source-tools label{display:none}.source-definition{min-height:85px}.sources-header{padding:10px 14px}}
+
+/* REBUILD: consistent three-glyph orbit and dynamic playgrounds */
+.orbit-button{width:64px!important;height:48px!important;min-width:64px!important;min-height:48px!important;padding:0!important;font-size:clamp(12px,2.1vw,16px)!important;letter-spacing:.02em!important}
+.orbit-button .scrambled{font-size:clamp(12px,2.1vw,16px)!important;letter-spacing:.05em!important}
+.orbit-button .real-label{font-size:clamp(10px,1.7vw,13px)!important;letter-spacing:0!important}
+.word-instructions{max-width:460px;margin:12px auto 8px;text-align:center;font-size:11px;line-height:1.6;color:var(--muted)}
+.word-instructions strong{color:var(--text);letter-spacing:.12em}.word-instructions p{margin:5px 0 8px}.word-instructions select{background:var(--panel-bg);color:var(--text);border:1px solid var(--border);padding:5px;max-width:190px}.word-instructions label{margin-right:8px}
+.source-physics{position:relative;flex:0 0 clamp(125px,24vh,260px);border-top:1px dashed var(--border);background:var(--bg);overflow:hidden;touch-action:none}
+.physics-chip{position:absolute;left:0;top:0;display:inline-flex;align-items:center;justify-content:center;padding:8px 12px;min-width:45px;min-height:33px;border-radius:50%;border:1px solid var(--border);background:var(--panel-bg);color:var(--text);font-size:clamp(12px,1.5vw,17px);white-space:nowrap;cursor:grab;touch-action:none;user-select:none;transform-origin:center;will-change:transform}
+.physics-chip.held{cursor:grabbing;border-color:var(--text);box-shadow:0 0 12px var(--border)}
+.source-word{touch-action:none}.source-word.selected{background:#e6c04b!important;color:#111!important}
+.video-overlay.open{display:flex!important;align-items:center;justify-content:center;background:#000!important;overflow:hidden!important}
+#videoFrame{width:100vw!important;height:100dvh!important;aspect-ratio:auto!important;margin:0!important;display:grid;place-items:center}
+#videoFrame iframe{width:100%;height:100%;border:0}
+.video-float-controls{position:absolute;right:max(12px,env(safe-area-inset-right));top:max(12px,env(safe-area-inset-top));display:flex;gap:8px;z-index:2;opacity:.35;transition:opacity .2s}.video-float-controls:hover,.video-float-controls:focus-within{opacity:1}.video-float-controls button{border:1px solid #666!important;background:#0009!important;color:white!important;font-size:22px!important}
+@media(max-width:700px){.orbit-button{width:51px!important;height:44px!important;min-width:51px!important;min-height:44px!important}.orbit-button .real-label{font-size:10px!important}.word-instructions{font-size:10px;line-height:1.35;max-width:92vw}.source-physics{flex-basis:145px}}
+@media(orientation:portrait) and (max-width:700px){#videoFrame iframe{width:100dvh;height:100vw;transform:rotate(90deg);max-width:none;flex-shrink:0}}
+
+/* Requested compact source drawer and reading directions */
+.source-tab{width:100%;text-align:left;font-size:11px;letter-spacing:.04em}
+.source-tab-panel[hidden]{display:none}
+.source-tab-panel{max-height:38vh;overflow:auto}
+.source-instructions{font-size:11px;line-height:1.55;padding:10px 18px;border-bottom:1px solid var(--border);color:var(--muted)}
+.source-instructions strong{color:var(--text)}
+#videoBack{font-size:13px!important;white-space:nowrap}
+
+/* READ physics: match WORDS rigid objects and give them real room to tumble. */
+.source-physics { flex: 1 1 40vh; min-height: 230px; overflow: hidden; position: relative; }
+.physics-chip { position:absolute; left:0; top:0; display:block; min-width:0; min-height:0; padding:0; border:0; border-radius:0; background:transparent; box-shadow:none; color:var(--text); font-size:inherit; cursor:grab; touch-action:none; user-select:none; transform-origin:center center; will-change:transform; z-index:10; }
+.physics-chip .word-chip-inner { pointer-events:none; }
+.physics-chip.held,.physics-chip.dragging { cursor:grabbing; border:0; box-shadow:none; }
+.physics-chip.held .word-chip-inner::before,.physics-chip.dragging .word-chip-inner::before { opacity:1; }
+@media(max-width:700px){.source-physics {flex:1 1 34vh;min-height:190px;}}
+
+/* READ: draggable panel divider (changes workspace height, never document zoom). */
+.source-main { --read-pane-height: 42%; overflow: hidden; }
+.source-main > .source-viewport { flex: 0 0 var(--read-pane-height); min-height: 65px; max-height: none; }
+.source-main > .source-physics { flex: 1 1 0; min-height: 65px; }
+.source-pane-splitter { flex: 0 0 17px; position: relative; display:flex; align-items:center; justify-content:center; cursor:row-resize; touch-action:none; user-select:none; border-top:1px solid var(--border); border-bottom:1px solid var(--border); background:var(--bg); z-index:4; }
+.source-pane-splitter:hover,.source-pane-splitter:focus-visible,.source-pane-splitter.is-dragging { background:var(--control-hover); outline:none; }
+.source-splitter-grip { display:flex; flex-direction:column; gap:2px; align-items:center; justify-content:center; width:70px; height:100%; }
+.source-splitter-grip i { display:block; width:32px; height:1px; background:var(--muted); }
+.source-pane-splitter:hover .source-splitter-grip i,.source-pane-splitter.is-dragging .source-splitter-grip i { background:var(--text); }
+body.source-resizing,body.source-resizing * { cursor:row-resize!important; user-select:none!important; }
+@media(max-width:700px){.source-main > .source-viewport{min-height:50px}.source-main > .source-physics{min-height:50px}.source-pane-splitter{flex-basis:22px}}
+
+/* ========================================
+   READ — IMAGE ZOOM AND PANEL RESIZING
+======================================== */
+
+/* Start the reading panel larger */
+.source-main {
+  --read-pane-height: 65%;
+  overflow: hidden;
+}
+
+/* Allow the document panel to resize */
+.source-main > .source-viewport {
+  flex: 0 0 var(--read-pane-height);
+  min-height: 20px;
+  max-height: none;
+  overflow: auto;
+}
+
+/* Zoom control toolbar */
+.source-zoom-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--border);
+  flex: none;
+  font-size: 11px;
+}
+
+.source-zoom-controls[hidden] {
+  display: none;
+}
+
+.source-zoom-controls button {
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.source-zoom-controls span {
+  min-width: 54px;
+  text-align: center;
+}
+
+/* Allow PNGs to zoom beyond the viewport */
+.source-page.zoomable {
+  max-width: none;
+  width: max-content;
+}
+
+.source-page.zoomable img {
+  display: block;
+  max-width: none;
+  width: auto;
+  height: auto;
+}
+/* Allow the reader splitter to move farther downward. */
+.source-main > .source-physics { min-height: 25px; }
+
+
+/* =========================================================
+   SOCIAL MENU
+   SOCIAL retracts every other button into itself, then three
+   icons disperse from the same spot. script.js sets the
+   per-button offsets (--social-dx / --social-dy) and toggles
+   .social-open (buttons retract) and .social-icons (icons out).
+========================================================= */
+
+.stage { --social-r: clamp(112px, 34vmin, 230px); }
+
+/* buttons can now be moved with the independent translate property */
+.orbit-button {
+    transition:
+        transform 0.3s cubic-bezier(.22, 1, .36, 1),
+        opacity 0.3s ease,
+        translate 0.55s cubic-bezier(.34, 1.3, .5, 1),
+        visibility 0s linear 0s;
+}
+
+/* the glyphs inside shrink separately, so the button itself never scales off-centre */
+.orbit-button .scrambled {
+    transition: scale 0.55s cubic-bezier(.34, 1.3, .5, 1);
+}
+
+.orbit-button .real-label {
+    transition:
+        opacity .22s ease,
+        transform .28s cubic-bezier(.22, 1, .36, 1),
+        scale .55s cubic-bezier(.34, 1.3, .5, 1);
+}
+
+.app.social-open .orbit-button:not(#socialButton) {
+    translate: var(--social-dx, 0px) var(--social-dy, 0px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+        transform 0.3s cubic-bezier(.22, 1, .36, 1),
+        translate 0.5s cubic-bezier(.6, 0, .3, 1) calc(var(--social-i, 0) * 30ms),
+        opacity 0.3s ease calc(0.2s + var(--social-i, 0) * 30ms),
+        visibility 0s linear 0.8s;
+}
+
+.app.social-open .orbit-button:not(#socialButton) > span {
+    scale: 0.1;
+    transition:
+        opacity .22s ease,
+        transform .28s cubic-bezier(.22, 1, .36, 1),
+        scale 0.5s cubic-bezier(.6, 0, .3, 1) calc(var(--social-i, 0) * 30ms);
+}
+
+/* SOCIAL turns into the close button while open */
+.app.social-open #socialButton .scrambled { opacity: 0; }
+
+
+/* SOCIAL close symbol only */
+.app.social-open #socialButton[aria-expanded="true"] .real-label {
+    opacity: 1;
+    font-size: 60px;
+}
+
+/* Normal SOCIAL label while returning to menu */
+#socialButton[aria-expanded="false"] .real-label {
+    font-size: inherit;
+}
+
+
+/* the icons */
+.social-links {
+    position: absolute;
+    inset: 0;
+    z-index: 12;
+    pointer-events: none;
+}
+
+.social-icon {
+    --sx: 0px;
+    --sy: 0px;
+
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 60px;
+    height: 60px;
+    margin: -30px 0 0 -30px;
+
+    display: grid;
+    place-items: center;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+
+    /* resting state: tucked inside the SOCIAL button */
+    translate: var(--hub-x, 0px) var(--hub-y, 0px);
+    scale: 0.15;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition:
+        translate 0.4s cubic-bezier(.6, 0, .3, 1),
+        scale 0.4s cubic-bezier(.6, 0, .3, 1),
+        opacity 0.25s ease 0.1s,
+        visibility 0s linear 0.4s;
+}
+
+.social-instagram { --sy: calc(var(--social-r) * -1); }
+.social-twitter   { --sx: calc(var(--social-r) * 0.866);  --sy: calc(var(--social-r) * 0.5); }
+.social-tiktok    { --sx: calc(var(--social-r) * -0.866); --sy: calc(var(--social-r) * 0.5); }
+
+.app.social-icons .social-icon {
+    translate: var(--sx) var(--sy);
+    scale: 1;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition:
+        translate 0.75s cubic-bezier(.3, 1.45, .45, 1) calc(var(--social-i, 0) * 90ms),
+        scale 0.75s cubic-bezier(.3, 1.45, .45, 1) calc(var(--social-i, 0) * 90ms),
+        opacity 0.3s ease calc(var(--social-i, 0) * 90ms),
+        visibility 0s linear calc(var(--social-i, 0) * 90ms);
+}
+
+.social-icon:focus-visible {
+    outline: 1px solid var(--text);
+    outline-offset: 2px;
+}
+
+/* the glyph is a rainbow gradient cut out by the icon shape */
+.social-glyph {
+    display: block;
+    width: 32px;
+    height: 32px;
+
+    background-image: linear-gradient(90deg, var(--rainbow-gradient));
+    background-size: 500% 100%;
+    animation: rainbowCycle var(--rainbow-speed) linear infinite;
+
+    -webkit-mask-image: var(--glyph);
+    mask-image: var(--glyph);
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+
+    transition: transform .25s cubic-bezier(.22, 1, .36, 1);
+}
+
+.social-icon:hover .social-glyph,
+.social-icon:focus-visible .social-glyph {
+    transform: scale(1.22) rotate(-6deg);
+}
+
+.app.rainbow-disabled .social-glyph {
+    animation: none;
+    background-image: none;
+    background-color: var(--text);
+}
+
+.social-name {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-top: -4px;
+    transform: translateX(-50%);
+    font-size: 9px;
+    letter-spacing: .16em;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.social-instagram .social-glyph { --glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='5'/%3E%3Ccircle cx='12' cy='12' r='4.2'/%3E%3Ccircle cx='17.6' cy='6.4' r='.6' fill='black'/%3E%3C/svg%3E"); }
+.social-twitter .social-glyph   { --glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-linecap='round'%3E%3Cpath d='M4.5 3.5l15 17' stroke-width='2.6'/%3E%3Cpath d='M19.5 3.5l-15 17' stroke-width='1.6'/%3E%3C/svg%3E"); }
+.social-tiktok .social-glyph    { --glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(0 2)'%3E%3Cpath d='M14 3v11.5a3.8 3.8 0 1 1-3.8-3.8'/%3E%3Cpath d='M14 3c.4 2.6 2.1 4.3 5 4.6'/%3E%3C/g%3E%3C/svg%3E"); }
+
+@media (prefers-reduced-motion: reduce) {
+    .orbit-button,
+    .orbit-button > span,
+    .social-icon,
+    .social-glyph {
+        transition-delay: 0s !important;
+    }
+}
+
+/* V5 — Original composition retained; only the initial reveal is new. */
+.app.awaiting-entry .stage .title,
+.app.awaiting-entry .stage .scramble-line,
+.app.awaiting-entry .stage .orbit-button,
+.app.awaiting-entry .stage .orbit-mark,
+.app.awaiting-entry .stage .social-links,
+.app.awaiting-entry .stage .center-hover-zone { opacity: 0 !important; pointer-events: none !important; }
+.app .stage .title, .app .stage .scramble-line,
+.app .stage .orbit-button, .app .stage .orbit-mark { transition: opacity .65s ease, transform .3s cubic-bezier(.22,1,.36,1); }
+.entry-gate { position:fixed; inset:0; z-index:12; width:100%; height:100%; border:0; background:transparent; display:grid; place-items:center; cursor:pointer; color:var(--text); padding:24px; transition:opacity .55s ease, visibility .55s ease; }
+.entry-prompt { display:block; max-width:94vw; font-family:"Fira Code","JetBrains Mono",monospace; font-size:clamp(15px,2.4vw,27px); letter-spacing:.11em; line-height:1.8; font-weight:400; text-align:center; animation:entryBlink 1.8s ease-in-out infinite, rainbowCycle var(--rainbow-speed) linear infinite; }
+@keyframes entryBlink { 0%,100% {opacity:1} 50% {opacity:.17} }
+.app.entered .entry-gate {opacity:0; visibility:hidden; pointer-events:none;}
+@media (prefers-reduced-motion:reduce) {.entry-prompt {animation:none;} .entry-gate {transition:none;}}
+
+
+
+/* MUSIC BUTTON — ROTATING NOTES ON HOVER */
+
+#musicButton .music-note-orbit {
+    position: relative;
+    display: block;
+    width: 42px;
+    height: 42px;
+    opacity: 0;
+    transform: none !important;
+    pointer-events: none;
+    animation: none;
+    transition: opacity 0.25s ease;
+}
+
+/* Reveal notes when hovering */
+#musicButton:hover .music-note-orbit,
+#musicButton:focus-visible .music-note-orbit,
+#musicButton.revealed .music-note-orbit {
+    opacity: 1;
+}
+
+/* Position notes at the center of the orbit */
+#musicButton .music-note-orbit > span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: block;
+    font-size: 20px;
+    line-height: 1;
+    animation: none;
+    transform-origin: center;
+}
+
+/* Each note starts at a different angle */
+#musicButton .music-note-orbit > span:nth-child(1) {
+    --start: 0deg;
+}
+
+#musicButton .music-note-orbit > span:nth-child(2) {
+    --start: 120deg;
+}
+
+#musicButton .music-note-orbit > span:nth-child(3) {
+    --start: 240deg;
+}
+
+/* Rotate notes in a circle while hovering */
+#musicButton:hover .music-note-orbit > span,
+#musicButton:focus-visible .music-note-orbit > span,
+#musicButton.revealed .music-note-orbit > span {
+    animation: musicCircle 3s linear infinite;
+}
+
+/* Circular orbit, keeping each note upright */
+@keyframes musicCircle {
+    from {
+        transform:
+            translate(-50%, -50%)
+            rotate(var(--start))
+            translateX(18px)
+            rotate(calc(-1 * var(--start)));
+    }
+
+    to {
+        transform:
+            translate(-50%, -50%)
+            rotate(calc(var(--start) + 360deg))
+            translateX(18px)
+            rotate(calc(-1 * (var(--start) + 360deg)));
+    }
+}
+
+/* Hide scrambled characters during hover */
+#musicButton:hover .scrambled,
+#musicButton:focus-visible .scrambled,
+#musicButton.revealed .scrambled {
+    opacity: 0;
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    #musicButton .music-note-orbit > span {
+        animation: none !important;
+    }
+}
+
+
+/* FINAL MUSIC ORBIT POSITION FIX */
+
+#musicButton .music-note-orbit > span:nth-child(1),
+#musicButton .music-note-orbit > span:nth-child(2),
+#musicButton .music-note-orbit > span:nth-child(3) {
+    top: 50%;
+    left: 50%;
+}
+
+/* Keep notes visible above the button background */
+#musicButton .music-note-orbit {
+    z-index: 2;
+}
+
+/* Make notes inherit the existing rainbow effect */
+#musicButton .music-note-orbit > span {
+    background-image: linear-gradient(
+        90deg,
+        var(--rainbow-gradient)
+    );
+    background-size: 500% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+
+/* SOCIAL MENU — Larger exit X */
+.app.social-open #socialButton[aria-expanded="true"] .real-label {
+    font-size: 80px !important;
+    line-height: 1;
+    opacity: 1;
+}
+
+
+/* CONCRETE POETRY / TYPOGRAPHIC SPIRAL NAVIGATION */
+.stage {
+  --poetry-unit: min(6.9px, .94vw);
+  width: min(690px, 94vw); height: min(690px, 86dvh);
+  display: block; padding: 0; overflow: visible;
+}
+.stage .title {
+  position:absolute; top:49%; left:50%; transform:translate(-50%,-50%);
+  font-size:clamp(15px,2.7vw,24px); letter-spacing:.24em;
+  z-index:6; white-space:nowrap; opacity:.9;
+}
+.stage .scramble-line { display:none; }
+.stage .orbit-mark,.stage .center-hover-zone {display:none !important;}
+.poetry-field {position:absolute;inset:0;pointer-events:none;z-index:2;overflow:visible;}
+.poetry-ring {position:absolute;inset:0;animation:poetryTurn var(--duration,80s) linear infinite;transform-origin:50% 50%;}
+.poetry-ring.reverse {animation-direction:reverse;}
+.poetry-fragment {
+  position:absolute;left:50%;top:50%;display:block;
+  color:var(--text);opacity:var(--alpha,.52);font-size:clamp(8px,1.35vw,12px);
+  font-weight:400;letter-spacing:.08em;white-space:nowrap;
+  transform:translate(-50%,-50%) rotate(var(--angle)) translateY(calc(-1 * var(--radius))) rotate(90deg);
+  text-shadow:0 0 9px rgba(180,180,180,.08);
+}
+.poetry-ring.reverse .poetry-fragment {transform:translate(-50%,-50%) rotate(var(--angle)) translateY(calc(-1 * var(--radius))) rotate(-90deg);}
+.stage .orbit-button {
+  position:absolute !important;z-index:7;
+  width:auto !important;height:auto !important;min-width:62px;min-height:42px;
+  padding:8px 9px;border:0;background:transparent;border-radius:0;
+  font-size:clamp(10px,1.65vw,13px);letter-spacing:.12em;
+  transform:translate(-50%,-50%) rotate(var(--tilt,0deg)) !important;
+  transition:opacity .35s ease,filter .3s ease,transform .4s cubic-bezier(.2,1,.3,1) !important;
+}
+.stage .orbit-button:hover,.stage .orbit-button:focus-visible {
+  transform:translate(-50%,-50%) rotate(0deg) scale(1.17) !important;
+  filter:drop-shadow(0 0 10px rgba(255,255,255,.25));
+}
+.stage .orbit-button .scrambled {display:none !important;}
+.stage .orbit-button .real-label {opacity:1 !important;transform:none !important;}
+.stage .orbit-button:hover .real-label {transform:none !important;}
+.stage .button-one {left:49%;top:12%;--tilt:-7deg;}
+.stage .button-two {left:76%;top:27%;--tilt:22deg;}
+.stage .button-six {left:87%;top:55%;--tilt:79deg;}
+.stage .button-four {left:70%;top:81%;--tilt:-19deg;}
+.stage .button-eight {left:35%;top:84%;--tilt:13deg;}
+.stage .button-five {left:13%;top:62%;--tilt:-72deg;}
+.stage .button-three {left:22%;top:29%;--tilt:-29deg;}
+
+@keyframes poetryTurn {to {transform:rotate(360deg)}}
+.app.settings-open .poetry-field,.app.music-open .poetry-field,
+.app.word-open .poetry-field,.app.sources-open .poetry-field,
+.app.video-open .poetry-field {opacity:0;transition:opacity .5s ease;}
+@media(max-width:600px) {
+  .stage {--poetry-unit:min(.95vw,4.4px);width:min(95vw,440px);height:min(95vw,440px);}
+  .stage .orbit-button {font-size:10px;min-width:54px;min-height:38px;padding:7px 4px;}
+  .poetry-fragment {font-size:9px;}
+  .stage .title {font-size:15px;}
+}
+@media(prefers-reduced-motion:reduce) {
+  .poetry-ring {animation:none !important;}
+  .stage .orbit-button {transition:none !important;}
+}
+
+/* === HEARTBEAT SPIRAL INTRO / PRECISE CIRCULAR NAVIGATION === */
+.stage { --orbit-radius: 44%; width:min(690px, 94vw, 78dvh); height:auto; aspect-ratio:1; }
+/* Intro: the prompt is the only visible foreground element. */
+.app.awaiting-entry .poetry-field,
+.app.awaiting-entry .stage .title { opacity:0 !important; }
+.app.awaiting-entry .stage .orbit-button { opacity:0 !important; pointer-events:none !important; }
+.app.awaiting-entry .corner,.app.awaiting-entry .status,.app.awaiting-entry .bottom-scramble { opacity:0; }
+.app.entering .entry-gate,.app.entered .entry-gate {opacity:0;visibility:hidden;pointer-events:none;}
+.entry-gate { transition:opacity .55s ease, visibility 0s linear .55s; }
+/* Keep the original independent clockwise / counterclockwise ring animations. */
+.poetry-field { transform-origin:center; transition:opacity .45s ease; }
+.app.entering .poetry-field { animation:spiralHeartbeat 1.95s cubic-bezier(.2,.75,.2,1) both; }
+.app.entered .poetry-field { opacity:1; transform:scale(1); }
+@keyframes spiralHeartbeat {
+  0% {opacity:0;transform:scale(.025);filter:blur(12px)}
+  18% {opacity:1;transform:scale(.34);filter:blur(3px)}
+  43% {opacity:1;transform:scale(1.30);filter:blur(0)}
+  62% {transform:scale(.88)}
+  77% {transform:scale(1.10)}
+  100% {opacity:1;transform:scale(1);filter:blur(0)}
+}
+.app.entering .stage .title {animation:spiralTitle 1.35s ease-out .45s both;}
+@keyframes spiralTitle {from {opacity:0;scale:.45} to {opacity:.9;scale:1}}
+
+/* ORIGINAL EIGHT-BUTTON WHEEL */
+
+.stage .orbit-button {
+    position: absolute !important;
+    right: auto !important;
+    bottom: auto !important;
+    rotate: none !important;
+    transform: translate(-50%, -50%) !important;
+    min-width: 78px !important;
+    min-height: 42px !important;
+    padding: 8px 10px !important;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* TOP */
+.stage .button-one {
+    left: 50% !important;
+    top: 8% !important;
+}
+
+/* RIGHT */
+.stage .button-two {
+    left: 92% !important;
+    top: 50% !important;
+}
+
+/* BOTTOM */
+.stage .button-three {
+    left: 50% !important;
+    top: 92% !important;
+}
+
+/* LEFT */
+.stage .button-four {
+    left: 8% !important;
+    top: 50% !important;
+}
+
+/* UPPER LEFT */
+.stage .button-five {
+    left: 21% !important;
+    top: 21% !important;
+}
+
+/* UPPER RIGHT */
+.stage .button-six {
+    left: 79% !important;
+    top: 21% !important;
+}
+
+/* LOWER RIGHT */
+.stage .button-seven {
+    left: 79% !important;
+    top: 79% !important;
+    display: grid !important;
+    visibility: visible !important;
+}
+
+/* LOWER LEFT */
+.stage .button-eight {
+    left: 21% !important;
+    top: 79% !important;
+}
+
+.stage .orbit-button:hover,
+.stage .orbit-button:focus-visible {
+    transform: translate(-50%, -50%) scale(1.12) !important;
+}
+
+
+.app.entering .stage .orbit-button {animation:orbitBloom .7s cubic-bezier(.2,1,.3,1) 1.28s both;pointer-events:none !important;}
+@keyframes orbitBloom {from {opacity:0;scale:.45} to {opacity:1;scale:1}}
+@media(max-width:600px) {
+ .stage {--orbit-radius:44%;width:min(94vw, 78dvh);}
+ .stage .orbit-button {min-width:55px !important;min-height:35px !important;padding:5px 3px !important;font-size:9px !important;}
+ .stage .orbit-button .real-label {font-size:9px !important;}
+ .stage {--poetry-unit:min(.90vw,4px);}
+}
+@media(prefers-reduced-motion:reduce) {
+ .app.entering .poetry-field,.app.entering .stage .title,.app.entering .stage .orbit-button {animation:none !important;opacity:1 !important;transform:none;}
+ .app.entering .stage .orbit-button {transform:translate(-50%,-50%) !important;}
+}
+
+
+/* ============================================
+   SPIRAL — SMOOTH MENU ENTRANCE / EXIT
+   Keeps the original rotating rings intact
+============================================ */
+
+/* Spiral visible on the main menu */
+.app .poetry-field {
+    opacity: 1;
+    scale: 1;
+    filter: blur(0);
+    transform-origin: center center;
+
+    transition:
+        opacity 0.55s ease,
+        scale 0.75s cubic-bezier(.22, 1, .36, 1),
+        filter 0.55s ease;
+}
+
+/* Hide spiral when entering any full-screen menu */
+.app.music-open .poetry-field,
+.app.music-closing .poetry-field,
+.app.page-active .poetry-field,
+.app.settings-open .poetry-field,
+.app.settings-transitioning .poetry-field,
+.app.sources-open .poetry-field,
+.app.video-open .poetry-field,
+.app.word-open .poetry-field {
+    opacity: 0;
+    scale: 0.65;
+    filter: blur(5px);
+    pointer-events: none;
+}
+
+/* Keep the spiral hidden during the return transition */
+.app.spiral-returning .poetry-field {
+    opacity: 0;
+    scale: 0.65;
+    filter: blur(5px);
+}
+
+/* Prevent spiral elements from intercepting clicks */
+.poetry-field,
+.poetry-ring,
+.poetry-fragment {
+    pointer-events: none;
+}
+
+/* Keep the clockwise and counterclockwise rotations */
+.poetry-ring {
+    animation: poetryTurn var(--duration, 80s)
+        linear infinite;
+}
+
+.poetry-ring.reverse {
+    animation-direction: reverse;
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .app .poetry-field {
+        transition: none;
+        filter: none;
+    }
+}
+
+
+
+
+/* Explicit state synchronized with the Music and Words transitions. */
+.app.spiral-menu-hidden .poetry-field { opacity: 0 !important; scale: .65; filter: blur(5px); pointer-events: none; }
+
+/* =========================================================
+   SPIRAL — SMOOTH RETURN TO MAIN MENU
+========================================================= */
+
+/* Normal state: spiral is fully visible */
+.app .poetry-field {
+    opacity: 1;
+    scale: 1;
+    filter: blur(0px);
+    visibility: visible;
+
+    transition:
+        opacity 0.85s ease-in-out,
+        scale 1s cubic-bezier(.22, 1, .36, 1),
+        filter 0.85s ease-in-out;
+}
+
+/* Hidden state: spiral fades and shrinks when menus open */
+.app.music-open .poetry-field,
+.app.music-closing .poetry-field,
+.app.page-active .poetry-field,
+.app.page-transitioning .poetry-field,
+.app.spiral-menu-hidden .poetry-field {
+    opacity: 0 !important;
+    scale: 0.65;
+    filter: blur(5px);
+    pointer-events: none;
+}
+
+
+/* ==========================================
+   CIRCULAR X BUTTONS — ALL MENUS
+========================================== */
+
+/* Music, Words, Settings, Read, Video */
+#closeMusic,
+#closeWord,
+#closeSettings,
+#closeSources,
+#videoClose {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px;
+    min-height: 42px;
+
+    padding: 0 !important;
+    box-sizing: border-box;
+
+    display: grid !important;
+    place-items: center;
+
+    border: 1px solid var(--text) !important;
+    border-radius: 50% !important;
+
+    background: transparent !important;
+    color: var(--text) !important;
+
+    font-size: 26px !important;
+    font-weight: 300;
+    line-height: 1 !important;
+
+    cursor: pointer;
+    -webkit-text-fill-color: var(--text) !important;
+}
+
+
+
+/* Hover: subtle rotation */
+#closeMusic:hover,
+#closeWord:hover,
+#closeSettings:hover,
+#closeSources:hover,
+#videoClose:hover {
+    transform: rotate(90deg);
+}
+
+
+
+/* ==========================================
+   SOCIAL MENU — PERFECT CIRCULAR CLOSE X
+========================================== */
+
+.app.social-open #socialButton[aria-expanded="true"] {
+    /* Override the orbit button's minimum width */
+    width: 54px !important;
+    height: 54px !important;
+    min-width: 54px !important;
+    max-width: 54px !important;
+    min-height: 54px !important;
+    max-height: 54px !important;
+
+    padding: 0 !important;
+    box-sizing: border-box !important;
+
+    display: grid !important;
+    place-items: center !important;
+
+    border: 1px solid var(--text) !important;
+    border-radius: 50% !important;
+    background: transparent !important;
+
+    /* Preserve the original SOCIAL button position */
+    translate: none !important;
+
+    opacity: 0.5 !important;
+    transition: opacity 0.3s ease !important;
+}
+
+/* Center the X inside the circle */
+.app.social-open #socialButton[aria-expanded="true"] .real-label {
+    display: grid !important;
+    place-items: center !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    font-size: 30px !important;
+    line-height: 1 !important;
+    letter-spacing: 0 !important;
+    transform: none !important;
+
+    opacity: 1 !important;
+    -webkit-text-fill-color: var(--text) !important;
+}
+
+/* Hide the scrambled label */
+.app.social-open #socialButton .scrambled {
+    opacity: 0 !important;
+}
+
+/* Full opacity on hover */
+.app.social-open #socialButton[aria-expanded="true"]:hover,
+.app.social-open #socialButton[aria-expanded="true"]:focus-visible {
+    opacity: 1 !important;
+}
+
+/* ==========================================
+   UNUSED ORBIT BUTTONS — LIVING GLITCHES
+========================================== */
+
+.stage .orbit-button.glitch-only {
+    display: grid !important;
+    place-items: center;
+    visibility: visible !important;
+    pointer-events: none !important;
+    cursor: default;
+
+    opacity: 0.75;
+}
+
+.stage .orbit-button.glitch-only .scrambled {
+    display: block !important;
+    opacity: 1 !important;
+    font-size: 16px !important;
+    letter-spacing: 0.12em;
+    white-space: nowrap;
+    min-width: 1ch;
+    text-align: center;
+}
+
+.stage .orbit-button.glitch-only .real-label {
+    display: none !important;
+}
+
+/* =========================================================
+   SPIRAL — RAINBOW COLORS + THEME, CONTROLLED BY SETTINGS
+   Plain animated text color (no background-clip), so it renders
+   in every browser. script.js writes --rainbow-c1..c7 from the
+   settings color pickers; speed and on/off use the same
+   --rainbow-speed variable and .rainbow-disabled class as the
+   buttons. Opacity (--alpha) is set per fragment in script.js:
+   faint on the outer rings, stronger toward the center.
+========================================================= */
+@keyframes spiralRainbow {
+    0%    { color: var(--rainbow-c1, #a83232); }
+    14.28% { color: var(--rainbow-c2, #c47a22); }
+    28.57% { color: var(--rainbow-c3, #b8b52a); }
+    42.85% { color: var(--rainbow-c4, #27a957); }
+    57.14% { color: var(--rainbow-c5, #2187a8); }
+    71.42% { color: var(--rainbow-c6, #5545a8); }
+    85.71% { color: var(--rainbow-c7, #9a329d); }
+    100%  { color: var(--rainbow-c1, #a83232); }
+}
+
+.poetry-fragment {
+    color: var(--rainbow-c1, #a83232);
+    text-shadow: none;
+    animation: spiralRainbow var(--rainbow-speed) linear infinite;
+    /* negative delay = each fragment starts at a different point in the cycle */
+    animation-delay: calc(var(--rainbow-speed) * var(--hue, 0) * -1);
+}
+
+/* Rainbow OFF: plain theme text (white in dark mode, near-black in light mode) */
+.app.rainbow-disabled .poetry-fragment {
+    animation: none;
+    color: var(--text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .poetry-fragment { animation: none !important; }
+}
+
+
+/* =========================================================
+   SOCIAL — CENTERED RAINBOW CLOSE BUTTON
+========================================================= */
+
+.stage .social-center-close {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 20;
+
+    width: 54px;
+    height: 54px;
+    padding: 0;
+
+    display: grid;
+    place-items: center;
+
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+
+    transform: translate(-50%, -50%) scale(.7);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    cursor: pointer;
+
+    transition:
+        opacity .28s ease,
+        transform .35s ease,
+        visibility 0s linear .35s;
+}
+
+/* Animated rainbow circle outline */
+.stage .social-center-close::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+
+    background: linear-gradient(
+        90deg,
+        var(--rainbow-gradient)
+    );
+
+    background-size: 500% 100%;
+
+    animation:
+        rainbowCycle var(--rainbow-speed) linear infinite;
+
+    -webkit-mask: radial-gradient(
+        farthest-side,
+        transparent calc(100% - 1.5px),
+        #000 calc(100% - 1px)
+    );
+
+    mask: radial-gradient(
+        farthest-side,
+        transparent calc(100% - 1.5px),
+        #000 calc(100% - 1px)
+    );
+}
+
+/* Animated rainbow X */
+.stage .social-center-x {
+    font-size: 33px;
+    line-height: 1;
+    font-weight: 300;
+
+    background: linear-gradient(
+        90deg,
+        var(--rainbow-gradient)
+    );
+
+    background-size: 500% 100%;
+
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    animation:
+        rainbowCycle var(--rainbow-speed) linear infinite;
+}
+
+/* Reveal center close button when SOCIAL opens */
+.app.social-open .stage .social-center-close {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+
+    transform: translate(-50%, -50%) scale(1);
+
+    transition-delay: 0s;
+}
+
+/* Hide original center text */
+.app.social-open .stage .title {
+    opacity: 0 !important;
+}
+
+/* Hide original social button while menu is open */
+.app.social-open .stage #socialButton {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+/* Respect rainbow disabled setting */
+.app.rainbow-disabled .social-center-close::before {
+    background: var(--text);
+    animation: none;
+}
+
+.app.rainbow-disabled .social-center-x {
+    background: none;
+    animation: none;
+    -webkit-text-fill-color: var(--text);
+    color: var(--text);
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .social-center-close::before,
+    .social-center-x {
+        animation: none !important;
+    }
+}

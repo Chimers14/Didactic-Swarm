@@ -1,0 +1,16 @@
+{
+  "name": "mixup-archive",
+  "version": "1.1.0",
+  "private": true,
+  "description": "Archive reading, word physics, and Mixup WIP",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "build:sources": "python build_sources.py"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}
