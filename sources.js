@@ -120,7 +120,7 @@ $('sourceZoomOut').onclick = () => {
 new ResizeObserver(() => {
   if (imageZoomMode === 'fit') updateImageZoom();
 }).observe(view);
-const videos=['hRlIUqOuiVs','MNqJK1gVss8',];let lastVideo=-1;
+const videos=['hRlIUqOuiVs','MNqJK1gVss8','MOfbMvdzGoU','riKwNTMo0Jo','g0ZwIUtl_Cw','0t8qYxSagYA'];let lastVideo=-1;
 const safe=(s)=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const notice=t=>$('sourceFeedback').textContent=t;
 const filename=u=>decodeURIComponent(u.split('/').pop().split('?')[0]);
